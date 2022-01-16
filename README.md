@@ -179,6 +179,46 @@ And set redirections in the OpenID authorize controller
   end
 ```
 
+Last, you need to store `last_login_at` field for users in order to keep track of timestamp while user logs in
+
+```elixir
+# priv/repo/migrations/<timestamp>_add_last_login_at_to_users.exs
+
+defmodule BorutaExample.Repo.Migrations.AddLastLoginAtToUsers do
+  use Ecto.Migration
+
+  def change do
+    alter table(:users) do
+      add :last_login_at, :utc_datetime_usec
+    end
+  end
+end
+
+# lib/boruta_example/accounts.ex:223
+
+...
+   def generate_user_session_token(user) do
+     {token, user_token} = UserToken.build_session_token(user)
+     Repo.insert!(user_token)
+     user |> User.login_changeset() |> Repo.update!()
+     token
+   end
+
+# lib/boruta_example/accounts/user.ex
+
+...
+  schema "users" do
+    ...
+    field :last_login_at, :utc_datetime_usec
+
+    timestamps()
+  end
+...
+   def login_changeset(user) do
+     change(user, last_login_at: DateTime.utc_now())
+   end
+```
+
 Here we are! You have a basic OpenID Connect provider. You can now create a client as described [here](https://patatoid.gitlab.io/boruta_auth/create_client.html) and start using it.
 Departing from there, you can use any OAuth/OpenID Connect client of your choice.
 

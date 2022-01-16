@@ -7,6 +7,7 @@ defmodule BorutaExample.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :last_login_at, :utc_datetime_usec
 
     timestamps()
   end
@@ -82,6 +83,10 @@ defmodule BorutaExample.Accounts.User do
       %{changes: %{email: _}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")
     end
+  end
+
+  def login_changeset(user) do
+    change(user, last_login_at: DateTime.utc_now())
   end
 
   @doc """
