@@ -1,13 +1,13 @@
 # Boruta Example
 
-You'll find here an example of implementation of an OAuth and OpenID Connect provider.
+  You'll find here an example of implementation of a basic [Boruta OAuth and OpenID Connect provider](https://patatoid.gitlab.io/boruta_auth).
 
 ## Setting up Boruta OAuth/OpenID Connect provider
-Boruta provides as its core all authorization business rules in order to handle underlying authorization logic of OAuth and OpenID Connect. Then it also provides a generator that helps creating a basic authorization provider as we will see. Note that most of below steps are documented in [README](https://patatoid.gitlab.io/boruta_auth/readme.html).
+Boruta provides as its core all authorization business rules in order to handle underlying authorization logic of OAuth and OpenID Connect. Then it provides a generator that helps creating required controllers, views and templates as we will see. Note that most of below steps are documented in [README](https://patatoid.gitlab.io/boruta_auth/readme.html).
 
-1. Bootstrap application
+### 1. Bootstrap application
 
-We will start by botsrapping a Phoenix web application with authentication capabilities provided by `phx.gen.auth` since OAuth and OpenID Connect specifications does not provide any recommandations about how to authenticate users but only about how to authorize them for an HTTP service with relative identity information layer given by the id token at destination to the client. Here we go, first bootstrapping the application:
+We will start by botsrapping a Phoenix web application with authentication capabilities provided by `phx.gen.auth` since OAuth and OpenID Connect specifications does not provide any recommandations about how to authenticate users. Instead, it provides all protocols required to authorize them to secure an HTTP service, with relative identity information in destination to the client brought by OpenID Connect core. Here we go, first bootstrapping the application:
 ```sh
 ~> mix phx.new boruta_example
 ```
@@ -23,9 +23,9 @@ In order to run the newly created application, you have to set up dependencies a
 ```
 Here is the application up and running, starting the web server with `mix phx.server` you'll be able to visit `http://localhost:4000` with your favorite browser.
 
-2. Bootstrap Boruta [commit](https://gitlab.com/patatoid/boruta_example/-/commit/fef019e22cb51c5a82b87193bc95676e8ccefbf0)
+### 2. Bootstrap Boruta _[commit](https://gitlab.com/patatoid/boruta_example/-/commit/fef019e22cb51c5a82b87193bc95676e8ccefbf0)_
 
-Once the application up with authentication, we can pass to the authorization part. First, you can add the Boruta dependency in `mix.exs`
+Once the application up, we can pass to the authorization part. First, you can add the Boruta dependency in `mix.exs`
 ```elixir
 # mix.exs
 
@@ -36,15 +36,15 @@ Once the application up with authentication, we can pass to the authorization pa
   end
 ```
 
-After that, you can generate controllers in order to expose Oauth and OpenID Connect core specifications endpoints and database migrations for the provider to be able to persist required clients, scopes and tokens by your newly created provider.
+After that, you'll be able to generate controllers in order to expose Oauth and OpenID Connect core specifications endpoints and database migrations to persist required clients, scopes and tokens needed by your newly created provider.
 
 ```sh
 ~> mix do deps.get, boruta.gen.migration, ecto.migrate, boruta.gen.controllers
 ```
 
-It will print the remaining steps to have the provider up and running. From there we will skip the testing part which uses Mox in order to mock Boruta and concentrate tests on the application layer.
+It will print the remaining steps to have the provider up and running as described in [documentation](https://patatoid.gitlab.io/boruta_auth/Mix.Tasks.Boruta.Gen.Controllers.html). From there we will skip the testing part which uses Mox in order to mock Boruta and focus tests on the application layer.
 
-3. Configure Boruta [commit](https://gitlab.com/patatoid/boruta_example/-/commit/cf3e4e3a9d2b0baf5ed24a8c38062fa34d2f3ea0)
+### 3. Configure Boruta _[commit](https://gitlab.com/patatoid/boruta_example/-/commit/cf3e4e3a9d2b0baf5ed24a8c38062fa34d2f3ea0)_
 
 As described in `boruta.gen.controllers` mix task output, you need to expose controller actions in `router.ex` as follow
 
@@ -81,9 +81,9 @@ config :boruta, Boruta.Oauth,
 ```
 Here client credentials flow should be up. For user flows you need further configuration and to implement `Boruta.Oauth.ResourceOwners` context.
 
-4. User flows [commit](https://gitlab.com/patatoid/boruta_example/-/commit/10c573e3663d1ba533f7613b8b1fe7e9eb266e06)
+### 4. User flows _[commit #1](https://gitlab.com/patatoid/boruta_example/-/commit/10c573e3663d1ba533f7613b8b1fe7e9eb266e06), [commit #2](https://gitlab.com/patatoid/boruta_example/-/commit/cfd1696f9050f822ef12fcd9a66e94947efbbde8)_
 
-As described in README, you can implement `Boruta.Oauth.ResourceOwners` as follow
+In order to have user flows operational, you need to implement `Boruta.Oauth.ResourceOwners` context as described in [Boruta README](https://patatoid.gitlab.io/boruta_auth/readme.html). Here it would look like
 ```elixir
 # lib/boruta_example/resource_owners.ex
 
@@ -113,7 +113,10 @@ defmodule BorutaExample.ResourceOwners do
   @impl Boruta.Oauth.ResourceOwners
   def check_password(resource_owner, password) do
     user = Repo.get_by(User, id: resource_owner.sub)
-    User.check_password(user, password)
+    case User.valid_password?(user, password) do
+      true -> :ok
+      false -> {:error, "Invalid email or password."}
+    end
   end
 
   @impl Boruta.Oauth.ResourceOwners
@@ -121,7 +124,7 @@ defmodule BorutaExample.ResourceOwners do
 end
 ```
 
-and provide it into main configuration
+and inject it with main configuration
 
 ```elixir
 # config/config.exs
@@ -133,7 +136,7 @@ config :boruta, Boruta.Oauth,
   ]
 ```
 
-The last part to setup is the redirection in OAuth authorize controller
+Last, you'll have to setup is the redirection in the OAuth authorize controller
 
 ```elixir
 # lib/boruta_example_web/controllers/oauth/authorize_controller.ex
@@ -146,9 +149,9 @@ The last part to setup is the redirection in OAuth authorize controller
 
 Here all OAuth flows should be up and running !
 
-5. OpenID Connect [commit](https://gitlab.com/patatoid/boruta_example/-/commit/a1bbf67ea4182c7adda0f30788a4d0e9722e6cbc)
+### 5. OpenID Connect _[commit](https://gitlab.com/patatoid/boruta_example/-/commit/a1bbf67ea4182c7adda0f30788a4d0e9722e6cbc)_
 
-In order to setup OpenID Connect, you need to tweak `phx.gen.auth` in order to redirect to login after logging out
+In order to setup OpenID Connect flows, you need to tweak `phx.gen.auth` in order to redirect to login after logging out
 ```elixir
 # lib/boruta_example_web/controllers/user_auth.ex:80
 
@@ -162,7 +165,7 @@ In order to setup OpenID Connect, you need to tweak `phx.gen.auth` in order to r
   end
 ```
 
-And set redirections in OpenID authorize controller
+And set redirections in the OpenID authorize controller
 ```elixir
 # lib/boruta_example_web/controllers/openid/authorize_controller.ex
 
@@ -176,6 +179,8 @@ And set redirections in OpenID authorize controller
   end
 ```
 
-Here we are! You have a basic OpenID Connect provider. You can now create a client and start using it.
+Here we are! You have a basic OpenID Connect provider. You can now create a client as described [here](https://patatoid.gitlab.io/boruta_auth/create_client.html) and start using it.
+Departing from there, you can use any OAuth/OpenID Connect client of your choice.
 
 Hope you enjoyed so far. The process can definitely improved at some points, all contributions of any kind will be very welcome.
+
