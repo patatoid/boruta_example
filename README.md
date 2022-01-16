@@ -103,7 +103,7 @@ defmodule BorutaExample.ResourceOwners do
     end
   end
   def get_by(sub: sub) do
-    with %User{id: id, email: email} = user <- Repo.get_by(User, id: sub) do
+    with %User{id: id, email: email} <- Repo.get_by(User, id: sub) do
       {:ok, %ResourceOwner{sub: id, username: email}}
     else
       _ -> {:error, "User not found."}

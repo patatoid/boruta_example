@@ -150,7 +150,7 @@ defmodule BorutaExampleWeb.Openid.AuthorizeController do
 
       current_user ->
         %ResourceOwner{
-          sub: current_user.id,
+          sub: to_string(current_user.id),
           username: current_user.email,
           last_login_at: current_user.last_login_at
         }
