@@ -31,7 +31,7 @@ Once the application up, we can pass to the authorization part. First, you can a
 
   def deps do
   ...
-      {:boruta, "~> 2.0.0-rc.1"},
+      {:boruta, git: "https://gitlab.com/patatoid/boruta_auth.git"},
   ...
   end
 ```
@@ -81,7 +81,7 @@ config :boruta, Boruta.Oauth,
 ```
 Here client credentials flow should be up. For user flows you need further configuration and to implement `Boruta.Oauth.ResourceOwners` context.
 
-### 4. User flows _[commit #1](https://gitlab.com/patatoid/boruta_example/-/commit/10c573e3663d1ba533f7613b8b1fe7e9eb266e06), [commit #2](https://gitlab.com/patatoid/boruta_example/-/commit/cfd1696f9050f822ef12fcd9a66e94947efbbde8)_
+### 4. User flows _[commit #1](https://gitlab.com/patatoid/boruta_example/-/commit/10c573e3663d1ba533f7613b8b1fe7e9eb266e06), [commit #2](https://gitlab.com/patatoid/boruta_example/-/commit/f88bec800cd8e46b624075e6024d5b83ccbda056)_
 
 In order to have user flows operational, you need to implement `Boruta.Oauth.ResourceOwners` context as described in [Boruta README](https://patatoid.gitlab.io/boruta_auth/readme.html). Here it would look like
 ```elixir
@@ -149,7 +149,7 @@ Last, you'll have to setup is the redirection in the OAuth authorize controller
 
 Here all OAuth flows should be up and running !
 
-### 5. OpenID Connect _[commit](https://gitlab.com/patatoid/boruta_example/-/commit/a1bbf67ea4182c7adda0f30788a4d0e9722e6cbc)_
+### 5. OpenID Connect _[commit #1](https://gitlab.com/patatoid/boruta_example/-/commit/a1bbf67ea4182c7adda0f30788a4d0e9722e6cbc)_, _[commit #2](https://gitlab.com/patatoid/boruta_example/-/commit/a99740613d6efebbd5b2729d40edf9b5eb9c7860)_
 
 In order to setup OpenID Connect flows, you need to tweak `phx.gen.auth` in order to redirect to login after logging out
 ```elixir
