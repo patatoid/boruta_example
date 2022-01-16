@@ -7,6 +7,7 @@ defmodule BorutaExampleWeb.Openid.AuthorizeController do
   alias Boruta.Oauth.Error
   alias Boruta.Oauth.ResourceOwner
   alias BorutaExampleWeb.OauthView
+  alias BorutaExampleWeb.UserAuth
 
   def oauth_module, do: Application.get_env(:boruta_example, :oauth_module, Boruta.Oauth)
 
@@ -156,17 +157,11 @@ defmodule BorutaExampleWeb.Openid.AuthorizeController do
     end
   end
 
-  defp redirect_to_login(_conn) do
-    raise """
-    Here occurs the login process. After login, user may be redirected to
-    get_session(conn, :user_return_to)
-    """
+  defp redirect_to_login(conn) do
+    redirect(conn, to: Routes.user_session_path(conn, :new))
   end
 
-  defp log_out_user(_conn) do
-    raise """
-    Here user shall be logged out then redirected to login. After login, user may be redirected to
-    get_session(conn, :user_return_to)
-    """
+  defp log_out_user(conn) do
+    UserAuth.log_out_user(conn)
   end
 end

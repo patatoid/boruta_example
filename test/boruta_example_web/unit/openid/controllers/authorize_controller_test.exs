@@ -240,24 +240,13 @@ defmodule BorutaExampleWeb.Controllers.Openid.AuthorizeControllerTest do
   end
 
   defp assert_authorize_redirected_to_login(conn) do
-    assert_raise RuntimeError,
-                 """
-                 Here occurs the login process. After login, user may be redirected to
-                 get_session(conn, :user_return_to)
-                 """,
-                 fn ->
-                   AuthorizeController.authorize(conn, %{})
-                 end
+    assert AuthorizeController.authorize(conn, %{}) |> redirected_to() == "/users/log_in"
   end
 
   defp assert_authorize_user_logged_out(conn) do
-    assert_raise RuntimeError,
-                 """
-                 Here user shall be logged out then redirected to login. After login, user may be redirected to
-                 get_session(conn, :user_return_to)
-                 """,
-                 fn ->
-                   AuthorizeController.authorize(conn, %{})
-                 end
+    conn = AuthorizeController.authorize(conn, %{})
+
+    refute get_session(conn, :user_token)
+    assert redirected_to(conn) == "/users/log_in"
   end
 end
