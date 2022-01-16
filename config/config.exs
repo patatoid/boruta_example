@@ -48,7 +48,10 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :boruta, Boruta.Oauth,
-  repo: BorutaExample.Repo
+  repo: BorutaExample.Repo,
+  contexts: [
+    resource_owners: BorutaExample.ResourceOwners
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

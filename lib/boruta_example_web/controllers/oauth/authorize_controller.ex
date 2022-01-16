@@ -81,10 +81,7 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
     )
   end
 
-  defp redirect_to_login(_conn) do
-    raise """
-    Here occurs the login process. After login, user may be redirected to
-    get_session(conn, :user_return_to)
-    """
+  defp redirect_to_login(conn) do
+    redirect(conn, to: Routes.user_session_path(conn, :new))
   end
 end
