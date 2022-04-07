@@ -7,7 +7,7 @@ defmodule BorutaExampleWeb.Oauth.IntrospectController do
   alias Boruta.Oauth.IntrospectResponse
   alias BorutaExampleWeb.OauthView
 
-  def oauth_module, do: Application.get_env(:boruta_example, :oauth_module, Boruta.OAuth)
+  def oauth_module, do: Application.get_env(:boruta_example, :oauth_module, Boruta.Oauth)
 
   def introspect(%Plug.Conn{} = conn, _params) do
     conn |> oauth_module().introspect(__MODULE__)

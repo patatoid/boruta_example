@@ -97,6 +97,12 @@ defmodule BorutaExampleWeb.Router do
     post "/introspect", IntrospectController, :introspect
   end
 
+  scope "/openid", BorutaExampleWeb.Openid do
+    pipe_through :api
+
+    get "/jwks", JwksController, :jwks_index
+  end
+
   scope "/oauth", BorutaExampleWeb.Oauth do
     pipe_through [:browser, :fetch_current_user]
 
