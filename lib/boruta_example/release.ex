@@ -17,7 +17,7 @@ defmodule BorutaExample.Release do
   end
 
   def seed do
-    Code.eval_file(Path.join(:code.priv_dir(:boruta_auth), "/repo/seeds.exs"))
+    Code.eval_file(Path.join(:code.priv_dir(:boruta_example), "/repo/seeds.exs"))
   end
 
   def setup do
