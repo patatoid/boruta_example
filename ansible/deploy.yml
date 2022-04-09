@@ -1,0 +1,248 @@
+- hosts: localhost
+  tasks:
+    - name: Add stable bitnami repo
+      kubernetes.core.helm_repository:
+        name: bitnami
+        repo_url: https://charts.bitnami.com/bitnami
+
+    - name: Add stable jetstack repo
+      kubernetes.core.helm_repository:
+        name: jetstack
+        repo_url: https://charts.jetstack.io
+
+    - name: Create a k8s namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        name: boruta-example
+        kind: Namespace
+        state: present
+
+    - name: Install cert-manager helm package
+      kubernetes.core.helm:
+        name: cert-manager
+        chart_ref: jetstack/cert-manager
+        chart_version: 1.8.0
+        release_namespace: cert-manager
+        create_namespace: true
+        values:
+          installCRDs: true
+
+    - name: Install postgres helm package
+      kubernetes.core.helm:
+        name: postgres
+        chart_ref: bitnami/postgresql
+        chart_version: 10.13.1
+        release_namespace: boruta-example
+        values:
+          postgresqlPassword: "{{ postgresql_password }}"
+          postgresqlMaxConnections: "200"
+
+    - name: Create libcluster role
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: Role
+          metadata:
+            name: libcluster-role
+            namespace: boruta-example
+          rules:
+          - apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["get", "list", "watch"]
+
+    - name: Create libcluster binding
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: RoleBinding
+          metadata:
+            name: libcluster-bindings
+            namespace: boruta-example
+          subjects:
+          - kind: ServiceAccount
+            name: default
+            namespace: boruta-example
+          roleRef:
+            kind: Role
+            name: libcluster-role
+            apiGroup: rbac.authorization.k8s.io
+
+    - name: Create OAuth Service
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: boruta-oauth
+            namespace: boruta-example
+            labels:
+              app: boruta
+          spec:
+            selector:
+              app: boruta
+            ports:
+            - protocol: TCP
+              targetPort: 4000
+              name: oauth-tcp
+              port: 4000
+
+    - name: Create SSL let's encrypt certificate
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: cert-manager.io/v1
+          kind: ClusterIssuer
+          metadata:
+            name: letsencrypt-production
+          spec:
+            acme:
+              email: io.pascal.knoth@gmail.com
+              server: https://acme-v02.api.letsencrypt.org/directory
+              privateKeySecretRef:
+                name: boruta-example
+              solvers:
+              - http01:
+                  ingress:
+                    class: nginx
+                selector:
+                  dnsZones:
+                  - 'example.boruta.patatoid.fr'
+
+    - name: Create Boruta Ingress
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: main-ingress
+            namespace: boruta-example
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-production
+            #   nginx.ingress.kubernetes.io/rewrite-target: /
+          spec:
+            rules:
+            - host: "{{ oauth_host }}"
+              http:
+                paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: boruta-oauth
+                      port:
+                        number: 4000
+            tls:
+              - hosts:
+                - "{{ oauth_host }}"
+                secretName: boruta-example
+
+    - name: create boruta app ConfigMap
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: boruta-env
+            namespace: boruta-example
+          data:
+            SECRET_KEY_BASE: fm6UIOyjYUe51Xo7JDTurwSeyOoZ15Kmlbj4NUhU9951P8cEUZc3k8bsAeJJtCvg
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: "{{ postgresql_password }}"
+            POSTGRES_DATABASE: boruta
+            POSTGRES_HOST: postgres-postgresql
+            OAUTH_CLIENT_ID: "{{ oauth_client_id }}"
+            OAUTH_CLIENT_SECRET: "{{ oauth_client_secret }}"
+
+    - name: Setup boruta database
+      register: database_setup
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: boruta-setup
+            namespace: boruta-example
+          backoffLimit: 3
+          spec:
+            template:
+              spec:
+                containers:
+                  - image: registry.gitlab.com/patatoid/boruta_example/app:latest
+                    command: ["/app/bin/boruta_example"]
+                    args: ["eval", "BorutaExample.Release.setup"]
+                    envFrom:
+                    - configMapRef:
+                        name: boruta-env
+                    imagePullPolicy: Always
+                    name: boruta
+                restartPolicy: OnFailure
+                imagePullSecrets:
+                - name: regcred
+
+    - name: Migrate boruta database
+      when: not database_setup.changed
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: "boruta-migration-{{ release_tag }}"
+            namespace: boruta-example
+          backoffLimit: 3
+          spec:
+            ttlSecondsAfterFinished: 864000
+            template:
+              spec:
+                containers:
+                  - image: "registry.gitlab.com/patatoid/boruta_example/app:{{ release_tag }}"
+                    command: ["/app/bin/boruta_example"]
+                    args: ["eval", "BorutaExample.Release.migrate"]
+                    envFrom:
+                    - configMapRef:
+                        name: boruta-env
+                    imagePullPolicy: Always
+                    name: boruta
+                restartPolicy: OnFailure
+                imagePullSecrets:
+                - name: regcred
+
+    - name: Create Boruta deployment
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: boruta
+            namespace: boruta-example
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: boruta
+            template:
+              metadata:
+                name: boruta
+                labels:
+                  app: boruta
+              spec:
+                containers:
+                  - image: "registry.gitlab.com/patatoid/boruta_example/app:{{ release_tag }}"
+                    readinessProbe:
+                      httpGet:
+                        path: /
+                        port: 4000
+                    envFrom:
+                    - configMapRef:
+                        name: boruta-env
+                    imagePullPolicy: Always
+                    name: boruta
+                imagePullSecrets:
+                - name: regcred
