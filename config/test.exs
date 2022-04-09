@@ -33,3 +33,4 @@ config :logger, level: :warn
 config :phoenix, :plug_init_mode, :runtime
 
 config :boruta_example, :oauth_module, Boruta.OauthMock
+config :boruta_example, :openid_module, Boruta.OpenidMock
