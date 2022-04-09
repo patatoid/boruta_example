@@ -14,6 +14,9 @@ config :boruta_example, BorutaExampleWeb.Endpoint,
   server: true,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :boruta, Boruta.Oauth,
+  issuer: "https://oauth.example.boruta.patatoid.fr"
+
 # Do not print debug messages in production
 config :logger, level: :info
 
