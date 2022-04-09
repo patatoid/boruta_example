@@ -14,7 +14,7 @@ defmodule BorutaExample.MixProject do
       releases: [
         boruta_example: [
           include_executables_for: [:unix],
-          applications: [runtime_tools: :permanent]
+          applications: [boruta_example: :permanent]
         ]
       ]
     ]
