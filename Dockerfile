@@ -11,7 +11,7 @@ RUN mix do clean, deps.get
 RUN mix compile
 
 WORKDIR /app
-RUN mix phx.digest
+RUN mix assets.deploy
 RUN mix release --force --overwrite
 
 FROM elixir:1.13.3
