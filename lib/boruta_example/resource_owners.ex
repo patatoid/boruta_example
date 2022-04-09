@@ -32,4 +32,7 @@ defmodule BorutaExample.ResourceOwners do
 
   @impl Boruta.Oauth.ResourceOwners
   def authorized_scopes(%ResourceOwner{}), do: []
+
+  @impl Boruta.Oauth.ResourceOwners
+  def claims(%ResourceOwner{}, _scope), do: %{}
 end
