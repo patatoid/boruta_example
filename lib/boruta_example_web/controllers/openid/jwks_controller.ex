@@ -11,6 +11,7 @@ defmodule BorutaExampleWeb.Openid.JwksController do
     openid_module().jwks(conn, __MODULE__)
   end
 
+  @impl Boruta.Openid.JwksApplication
   def jwk_list(conn, jwk_keys) do
     conn
     |> put_view(OpenidView)
