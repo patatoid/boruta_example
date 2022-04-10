@@ -101,6 +101,7 @@ defmodule BorutaExampleWeb.Router do
     pipe_through :api
 
     get "/userinfo", UserinfoController, :userinfo
+    post "/userinfo", UserinfoController, :userinfo
     get "/jwks", JwksController, :jwks_index
   end
 
