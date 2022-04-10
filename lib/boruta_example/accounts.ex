@@ -223,8 +223,11 @@ defmodule BorutaExample.Accounts do
   def generate_user_session_token(user) do
     {token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token)
-    user |> User.login_changeset() |> Repo.update!()
     token
+  end
+
+  def update_last_login_at(user) do
+    user |> User.login_changeset() |> Repo.update!()
   end
 
   @doc """
