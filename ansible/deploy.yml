@@ -157,6 +157,8 @@
             POSTGRES_HOST: postgres-postgresql
             OAUTH_CLIENT_ID: "{{ oauth_client_id }}"
             OAUTH_CLIENT_SECRET: "{{ oauth_client_secret }}"
+            SECOND_OAUTH_CLIENT_ID: "{{ second_oauth_client_id }}"
+            SECOND_OAUTH_CLIENT_SECRET: "{{ second_oauth_client_secret }}"
 
     - name: Setup boruta database
       register: database_setup
