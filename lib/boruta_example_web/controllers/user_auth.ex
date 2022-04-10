@@ -26,7 +26,7 @@ defmodule BorutaExampleWeb.UserAuth do
   """
   def log_in_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
-    Accounts.update_last_login_at(user)
+    Accounts.update_last_login_at!(user)
     user_return_to = get_session(conn, :user_return_to)
 
     conn
