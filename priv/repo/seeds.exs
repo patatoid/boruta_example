@@ -4,6 +4,30 @@ Boruta.Ecto.Admin.create_scope(
     public: true
   }
 )
+Boruta.Ecto.Admin.create_scope(
+  %{
+    name: "profile",
+    public: true
+  }
+)
+Boruta.Ecto.Admin.create_scope(
+  %{
+    name: "email",
+    public: true
+  }
+)
+Boruta.Ecto.Admin.create_scope(
+  %{
+    name: "address",
+    public: true
+  }
+)
+Boruta.Ecto.Admin.create_scope(
+  %{
+    name: "phone",
+    public: true
+  }
+)
 
 Boruta.Ecto.Admin.create_client(
   %{
