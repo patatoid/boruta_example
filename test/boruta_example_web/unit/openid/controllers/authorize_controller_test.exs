@@ -36,7 +36,8 @@ defmodule BorutaExampleWeb.Controllers.Openid.AuthorizeControllerTest do
       error = %Error{
         status: :unauthorized,
         error: :invalid_resource_owner,
-        error_description: "Error description"
+        error_description: "Error description",
+        format: :query
       }
 
       Boruta.OauthMock

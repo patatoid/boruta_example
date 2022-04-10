@@ -44,8 +44,7 @@ defmodule BorutaExampleWeb.Openid.AuthorizeController do
         authorize_error(conn, %{
           error
           | error: :login_required,
-            error_description: "User is not logged in.",
-            format: :fragment
+            error_description: "User is not logged in."
         })
 
       _ ->
