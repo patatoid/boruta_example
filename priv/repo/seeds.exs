@@ -28,6 +28,12 @@ Boruta.Ecto.Admin.create_scope(
     public: true
   }
 )
+Boruta.Ecto.Admin.create_scope(
+  %{
+    name: "offline_access",
+    public: true
+  }
+)
 
 Boruta.Ecto.Admin.create_client(
   %{
