@@ -10,3 +10,14 @@ You can start this example provider by running the following command
 ```sh
 ~> mix do deps.get, ecto.setup, phx.server
 ```
+
+## OpenID Connect core 1.0 certification
+
+This project is deployed following continuous integration to a private kubernetes cluster. The application is exposed under `oauth.example.boruta.patatoid.fr` domain, accessible [here](https://oauth.example.boruta.patatoid.fr/).
+
+This is intended to follow OpenID Connect core specification. The server passes certification test suites:
+- Basic OpenID Provider - https://www.certification.openid.net/plan-detail.html?plan=e9l28WdqKZhWs&public=true
+- Implicit OpenID Provider - https://www.certification.openid.net/plan-detail.html?plan=7h3ieIQijnm2s&public=true
+- Hybrid OpenID Provider - https://www.certification.openid.net/plan-detail.html?plan=paPEmQb7G5hcp&public=true
+
+> Note: Since automated tests are only a step in the specification those are only indicative.

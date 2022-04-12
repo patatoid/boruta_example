@@ -10,8 +10,12 @@ import Config
 # which you should run after static files are built and
 # before starting your production server.
 config :boruta_example, BorutaExampleWeb.Endpoint,
-  url: [host: "example.com", port: 80],
+  http: [port: 4000],
+  server: true,
   cache_static_manifest: "priv/static/cache_manifest.json"
+
+config :boruta, Boruta.Oauth,
+  issuer: "https://oauth.example.boruta.patatoid.fr"
 
 # Do not print debug messages in production
 config :logger, level: :info

@@ -1,0 +1,10 @@
+---
+postgresql_password: IEIsAxyDwVD+hR+se5aI60ZkFyKRvH61Gh59BR4zfJ46EtOw4iFIi5mH3EjgAL6K # TODO store password in ansible vault
+
+oauth_host: oauth.example.boruta.local
+
+oauth_client_id: 6a2f41a3-c54c-fce8-32d2-0324e1c32e20
+oauth_client_secret: "777"
+
+second_oauth_client_id: 4b6d0564-f448-4ded-9bd9-15851142e6a8
+second_oauth_client_secret: "777"
