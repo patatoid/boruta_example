@@ -41,7 +41,7 @@ defmodule BorutaExample.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:boruta, git: "https://gitlab.com/patatoid/boruta_auth.git"},
+      {:boruta, "~> 2.1"},
       {:bcrypt_elixir, "~> 2.0"},
       {:phoenix, "~> 1.6.2"},
       {:phoenix_ecto, "~> 4.4"},
