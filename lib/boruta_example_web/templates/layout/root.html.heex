@@ -27,5 +27,11 @@
       </section>
     </header>
     <%= @inner_content %>
+    <footer style="line-height: 2.5em; text-align: right;">
+      This application is a sample Oauth / OpenID Connect provider created using <a href="https://hex.pm/packages/boruta">Boruta</a>. Code is hosted on
+      <a href="https://gitlab.com/patatoid/boruta_example" style="vertical-align: top; margin-left: -.8em;">
+        <img src={Routes.static_path(@conn, "/images/gitlab-logo-300.png")} style="height: 2.5em;" alt="Phoenix Framework Logo"/>
+      </a>
+    </footer>
   </body>
 </html>
