@@ -1,8 +1,8 @@
 # Boruta Example
 
-You'll find here an example of implementation of a basic [Boruta OAuth and OpenID Connect provider](https://patatoid.gitlab.io/boruta_auth).
+You'll find here an example of implementation of a basic [Boruta OAuth and OpenID Connect provider](https://github.com/malach-it/boruta_auth).
 
-Step by step guide to described how this example has been setup can be found [here](https://patatoid.gitlab.io/boruta_auth/provider_integration.html).
+Step by step guide to described how this example has been setup can be found [here](https://hexdocs.pm/boruta/provider_integration.html).
 
 ## Starting the web server
 
