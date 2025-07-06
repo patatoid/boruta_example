@@ -1,5 +1,6 @@
 defmodule BorutaExampleWeb.Oauth.TokenController do
   @behaviour Boruta.Oauth.TokenApplication
+  @behaviour Boruta.Openid.CredentialApplication
 
   use BorutaExampleWeb, :controller
 
@@ -7,10 +8,14 @@ defmodule BorutaExampleWeb.Oauth.TokenController do
   alias Boruta.Oauth.TokenResponse
   alias BorutaExampleWeb.OauthView
 
-  def oauth_module, do: Application.get_env(:boruta_example, :oauth_module, Boruta.OAuth)
+  def oauth_module, do: Application.get_env(:boruta_example, :oauth_module, Boruta.Oauth)
 
   def token(%Plug.Conn{} = conn, _params) do
     conn |> oauth_module().token(__MODULE__)
+  end
+
+  def credential(conn, params) do
+    Boruta.Openid.credential(conn, params, %{}, __MODULE__)
   end
 
   @impl Boruta.Oauth.TokenApplication
@@ -24,6 +29,21 @@ defmodule BorutaExampleWeb.Oauth.TokenController do
 
   @impl Boruta.Oauth.TokenApplication
   def token_error(conn, %Error{status: status, error: error, error_description: error_description}) do
+    conn
+    |> put_status(status)
+    |> put_view(OauthView)
+    |> render("error.json", error: error, error_description: error_description)
+  end
+
+  @impl Boruta.Openid.CredentialApplication
+  def credential_created(conn, credential) do
+    conn
+    |> put_view(OauthView)
+    |> render("credential.json", credential: credential)
+  end
+
+  @impl Boruta.Openid.CredentialApplication
+  def credential_failure(conn, %Error{status: status, error: error, error_description: error_description}) do
     conn
     |> put_status(status)
     |> put_view(OauthView)

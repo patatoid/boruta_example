@@ -6,7 +6,11 @@ defmodule BorutaExample.Repo.Migrations.CreateAnExampleClient do
       name: "Example client",
       id: "00000000-0000-0000-0000-000000000001",
       secret: "secret",
-      redirect_uris: ["http://redirect.uri"]
+      redirect_uris: [
+        "http://redirect.uri",
+        "http://localhost:4000/wallet/preauthorized-code",
+        "http://localhost:4000/wallet/verifiable-presentation"
+      ]
     })
   end
 

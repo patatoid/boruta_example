@@ -13,9 +13,37 @@ defmodule BorutaExample.ResourceOwners do
       _ -> {:error, "User not found."}
     end
   end
-  def get_by(sub: sub) do
+  def get_by(sub: sub, scope: _scope) do
     with %User{id: id, email: email} = user <- Repo.get_by(User, id: sub) do
-      {:ok, %ResourceOwner{sub: to_string(id), username: email}}
+      {:ok, %ResourceOwner{
+        sub: to_string(id),
+        username: email,
+        extra_claims: %{
+          "username" => email
+        },
+        authorization_details: [%{
+          "type" => "openid_credential",
+          "format" => "vc+sd-jwt",
+          "credential_configuration_id" => "emailCredential",
+          "credential_identifiers" => ["emailCredential"]
+        }],
+        credential_configuration: %{
+          "emailCredential" => %{
+            version: "13",
+            vct: "urn:test",
+            defered: false,
+            types: ["emailCredential"],
+            format: "vc+sd-jwt",
+            time_to_live: 10,
+            claims: [
+              %{
+                "name" => "username",
+                "pointer" => "username"
+              }
+            ]
+          }
+        }
+      }}
     else
       _ -> {:error, "User not found."}
     end

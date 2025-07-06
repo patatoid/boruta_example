@@ -6,6 +6,7 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
   alias Boruta.Oauth.AuthorizeResponse
   alias Boruta.Oauth.Error
   alias Boruta.Oauth.ResourceOwner
+  alias Boruta.Openid.CredentialOfferResponse
   alias BorutaExampleWeb.OauthView
 
   def oauth_module, do: Application.get_env(:boruta_example, :oauth_module, Boruta.Oauth)
@@ -23,7 +24,35 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
   defp authorize_response(conn, %_{} = current_user) do
     conn
     |> oauth_module().authorize(
-      %ResourceOwner{sub: to_string(current_user.id), username: current_user.email},
+      %ResourceOwner{
+        sub: to_string(current_user.id),
+        username: current_user.email,
+        extra_claims: %{
+          "username" => current_user.email
+        },
+        authorization_details: [%{
+          "type" => "openid_credential",
+          "format" => "vc+sd-jwt",
+          "credential_configuration_id" => "emailCredential",
+          "credential_identifiers" => ["emailCredential"]
+        }],
+        credential_configuration: %{
+          "emailCredential" => %{
+            version: "13",
+            vct: "urn:test",
+            defered: false,
+            types: ["emailCredential"],
+            format: "vc+sd-jwt",
+            time_to_live: 10,
+            claims: [
+              %{
+                "name" => "username",
+                "pointer" => "username"
+              }
+            ]
+          }
+        }
+      },
       __MODULE__
     )
   end
@@ -38,6 +67,22 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
         %AuthorizeResponse{} = response
       ) do
     redirect(conn, external: AuthorizeResponse.redirect_to_url(response))
+  end
+
+  def authorize_success(
+        conn,
+        %CredentialOfferResponse{} = response
+      ) do
+
+    redirect(conn, external: credential_offer_redirect_uri(response))
+  end
+
+  defp credential_offer_redirect_uri(credential_offer) do
+    "#{credential_offer.redirect_uri}?credential_offer=#{credential_offer
+      |> Map.from_struct()
+      |> Map.take([:credential_configuration_ids, :credential_issuer, :grants])
+      |> Jason.encode!()
+      |> URI.encode_www_form()}"
   end
 
   @impl Boruta.Oauth.AuthorizeApplication

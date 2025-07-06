@@ -10,7 +10,8 @@ defmodule BorutaExampleWeb.OauthView do
           access_token: access_token,
           expires_in: expires_in,
           refresh_token: refresh_token,
-          id_token: id_token
+          id_token: id_token,
+          authorization_details: authorization_details
         }
       }) do
     Enum.filter(
@@ -19,7 +20,8 @@ defmodule BorutaExampleWeb.OauthView do
         access_token: access_token,
         expires_in: expires_in,
         refresh_token: refresh_token,
-        id_token: id_token
+        id_token: id_token,
+        authorization_details: authorization_details
       },
       fn
         {_key, nil} -> false
@@ -27,6 +29,13 @@ defmodule BorutaExampleWeb.OauthView do
       end
     )
     |> Enum.into(%{})
+  end
+
+  def render("credential.json", %{credential: credential}) do
+    %{
+      format: credential.format,
+      credential: credential.credential
+    }
   end
 
   def render("introspect.json", %{

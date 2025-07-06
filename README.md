@@ -36,3 +36,7 @@ http://localhost:4000/oauth/authorize?client_id=00000000-0000-0000-0000-00000000
 3. Obtain an id_token and a code
 
 http://localhost:4000/oauth/authorize?client_id=00000000-0000-0000-0000-000000000001&redirect_uri=http://redirect.uri&response_type=code+id_token&state=qrm0c4xm&scope=openid&nonce=nonce
+
+4. Obtain a credential
+
+http://localhost:4000/oauth/authorize?client_id=00000000-0000-0000-0000-000000000001&redirect_uri=http://localhost:4000/wallet/preauthorized-code&response_type=urn:ietf:params:oauth:response-type:pre-authorized_code&client_metadata={}&state=qrm0c4xm&scope=openid

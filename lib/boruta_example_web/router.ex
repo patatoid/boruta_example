@@ -95,6 +95,12 @@ defmodule BorutaExampleWeb.Router do
     post "/users/confirm/:token", UserConfirmationController, :update
   end
 
+  scope "/openid", BorutaExampleWeb.Oauth do
+    pipe_through :api
+
+    post "/credential", TokenController, :credential
+  end
+
   scope "/oauth", BorutaExampleWeb.Oauth do
     pipe_through :api
 

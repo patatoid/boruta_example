@@ -51,7 +51,12 @@ config :boruta, Boruta.Oauth,
   repo: BorutaExample.Repo,
   contexts: [
     resource_owners: BorutaExample.ResourceOwners
-  ]
+  ],
+  issuer: "http://localhost:4000",
+  universal_did_auth: %{
+    type: "bearer",
+    token: "<UNIVERSAL API KEY>"
+  }
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
