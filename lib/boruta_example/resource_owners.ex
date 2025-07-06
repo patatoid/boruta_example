@@ -29,4 +29,9 @@ defmodule BorutaExample.ResourceOwners do
 
   @impl Boruta.Oauth.ResourceOwners
   def authorized_scopes(%ResourceOwner{}), do: []
+
+  @impl Boruta.Oauth.ResourceOwners
+  def claims(%ResourceOwner{username: username}, _scope), do: %{
+    "username" => username
+  }
 end
