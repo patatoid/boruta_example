@@ -7,6 +7,7 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
   alias Boruta.Oauth.Error
   alias Boruta.Oauth.ResourceOwner
   alias Boruta.Openid.CredentialOfferResponse
+  alias Boruta.Openid.VerifiablePresentationResponse
   alias BorutaExampleWeb.OauthView
 
   def oauth_module, do: Application.get_env(:boruta_example, :oauth_module, Boruta.Oauth)
@@ -32,7 +33,7 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
         },
         authorization_details: [%{
           "type" => "openid_credential",
-          "format" => "vc+sd-jwt",
+          "format" => "jwt_vc",
           "credential_configuration_id" => "emailCredential",
           "credential_identifiers" => ["emailCredential"]
         }],
@@ -42,14 +43,30 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
             vct: "urn:test",
             defered: false,
             types: ["emailCredential"],
-            format: "vc+sd-jwt",
-            time_to_live: 10,
+            format: "jwt_vc",
+            time_to_live: 3600 * 24 * 10,
             claims: [
               %{
                 "name" => "username",
                 "pointer" => "username"
               }
             ]
+          }
+        },
+        presentation_configuration: %{
+          "email" => %{
+            definition: %{
+              "id" => "email",
+              "input_descriptors" => [%{
+                "id" => "email",
+                "format" => %{
+                  "jwt_vc" => %{}
+                },
+                "constraints" => %{
+                  "fields" => [%{"path" => ["$.username"]}]
+                }
+              }]
+            }
           }
         }
       },
@@ -75,6 +92,22 @@ defmodule BorutaExampleWeb.Oauth.AuthorizeController do
       ) do
 
     redirect(conn, external: credential_offer_redirect_uri(response))
+  end
+
+  def authorize_success(
+        %Plug.Conn{} = conn,
+        %VerifiablePresentationResponse{response_mode: "direct_post"} = response
+      ) do
+    conn
+    |> redirect(
+      external:
+        VerifiablePresentationResponse.redirect_to_deeplink(response, fn code ->
+          uri = URI.parse(Boruta.Config.issuer())
+
+          %{uri | path: Routes.direct_post_path(conn, :direct_post, code)}
+          |> URI.to_string()
+        end)
+    )
   end
 
   defp credential_offer_redirect_uri(credential_offer) do

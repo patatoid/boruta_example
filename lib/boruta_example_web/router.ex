@@ -101,6 +101,12 @@ defmodule BorutaExampleWeb.Router do
     post "/credential", TokenController, :credential
   end
 
+  scope "/openid", BorutaExampleWeb.Openid do
+    pipe_through :api
+
+    post "/direct_post/:code_id", DirectPostController, :direct_post
+  end
+
   scope "/oauth", BorutaExampleWeb.Oauth do
     pipe_through :api
 

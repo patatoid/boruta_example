@@ -23,7 +23,7 @@ defmodule BorutaExample.ResourceOwners do
         },
         authorization_details: [%{
           "type" => "openid_credential",
-          "format" => "vc+sd-jwt",
+          "format" => "jwt_vc",
           "credential_configuration_id" => "emailCredential",
           "credential_identifiers" => ["emailCredential"]
         }],
@@ -33,14 +33,30 @@ defmodule BorutaExample.ResourceOwners do
             vct: "urn:test",
             defered: false,
             types: ["emailCredential"],
-            format: "vc+sd-jwt",
-            time_to_live: 10,
+            format: "jwt_vc",
+            time_to_live: 3600 * 24 * 10,
             claims: [
               %{
                 "name" => "username",
                 "pointer" => "username"
               }
             ]
+          }
+        },
+        presentation_configuration: %{
+          "email" => %{
+            definition: %{
+              "id" => "email",
+              "input_descriptors" => [%{
+                "id" => "email",
+                "format" => %{
+                  "jwt_vc" => %{}
+                },
+                "constraints" => %{
+                  "fields" => [%{"path" => ["$.username"]}]
+                }
+              }]
+            }
           }
         }
       }}
