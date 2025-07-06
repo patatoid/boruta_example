@@ -25,7 +25,12 @@ config :boruta_example, BorutaExampleWeb.Endpoint,
   secret_key_base: "HkInwI3vtpd9C3Dhe+xmZYwuGs9sL+g2fJbp1ctgz2DsrDklsJvWG0CDeg8kL3iu",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    npm: [
+      "run",
+      "build:watch",
+      cd: Path.expand("../assets/wallet", __DIR__)
+    ]
   ]
 
 # ## SSL Support

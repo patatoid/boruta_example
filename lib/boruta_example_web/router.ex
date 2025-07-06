@@ -23,6 +23,12 @@ defmodule BorutaExampleWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/wallet", BorutaExampleWeb do
+    pipe_through(:browser)
+
+    match(:get, "/*path", PageController, :wallet)
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", BorutaExampleWeb do
   #   pipe_through :api

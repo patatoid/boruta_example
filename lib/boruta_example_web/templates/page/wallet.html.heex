@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Boruta · Administration panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css" integrity="sha512-KXol4x3sVoO+8ZsWPFI/r5KBVB/ssCGB5tsv2nVOKwLg33wTFP3fmnXa47FdSVIshVTgsYk/1734xSk9aFIa4A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script>
+      window.env = {
+        BORUTA_OAUTH_CLIENT_ID: '00000000-0000-0000-0000-000000000001',
+        BORUTA_OAUTH_BASE_URL: 'http://localhost:4000'
+      }
+    </script>
+    <link rel="manifest" type="text/css" href="/wallet/manifest.webmanifest" media="all"/>
+    <link rel="stylesheet" type="text/css" href="/wallet/boruta-wallet.css" media="all"/>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but boruta-admin doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+
+    <script type="module" src="/wallet/app.es.js"></script>
+  </body>
+</html>

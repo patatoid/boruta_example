@@ -9,6 +9,8 @@ Integration example of [boruta core library](https://hex.pm/packages/boruta) wit
 ```
 mix deps.get
 mix ecto.migrate
+cd ./assets/wallet
+npm i
 ```
 
 2. start the server
