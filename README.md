@@ -13,7 +13,9 @@ cd ./assets/wallet
 npm i
 ```
 
-2. start the server
+2. Fill in universal resolver api key in `config/config.exs` file
+
+3. start the server
 
 ```
 mix phx.server
